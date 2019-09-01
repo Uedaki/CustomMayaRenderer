@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -241,10 +241,15 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collection.h" />
+    <ClInclude Include="Context.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GlobalsNode.h" />
+    <ClInclude Include="Hitable.h" />
     <ClInclude Include="HitRecord.h" />
-    <ClInclude Include="IHitable.h" />
+    <ClInclude Include="LambertMaterial.h" />
+    <ClInclude Include="LambertNode.h" />
+    <ClInclude Include="LambertShader.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Ray.h" />
@@ -259,7 +264,12 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClCompile Include="Collection.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GlobalNode.cpp" />
+    <ClCompile Include="Hitable.cpp" />
+    <ClCompile Include="LambertMaterial.cpp" />
+    <ClCompile Include="LambertNode.cpp" />
+    <ClCompile Include="LambertShader.cpp" />
     <ClCompile Include="mainPlugin.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -270,6 +280,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="RenderProcedure.cpp" />
     <ClCompile Include="RenderRegionProcedure.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config\customMayaRenderer.mod" />

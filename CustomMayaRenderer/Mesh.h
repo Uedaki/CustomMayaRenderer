@@ -4,32 +4,32 @@
 
 #include <glm/glm.hpp>
 
+#include <string>
 #include <vector>
 
-#include "IHitable.h"
+#include "Hitable.h"
+#include "Material.h"
 
 struct Ray;
 struct HitRecord;
 
-class Mesh : public IHitable
+class Mesh : public Hitable
 {
 	struct Triangle
 	{
 		int a;
 		int b;
 		int c;
-		glm::vec3 na;
-		glm::vec3 nb;
-		glm::vec3 nc;
 	};
 
 public:
-	Mesh(MFnMesh &obj);
+	Mesh(MFnMesh &mMesh);
 
-	bool hit(const Ray &ray, float min, float max, HitRecord &record) const override;
+	bool hit(const Ray &ray, float min, float max, HitRecord &record) const;
 
 private:
+	std::string name;
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> normals;
 	std::vector<Triangle> indices;
+	Material *material;
 };

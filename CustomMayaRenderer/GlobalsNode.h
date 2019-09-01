@@ -2,6 +2,8 @@
 
 #include <Maya/MPxNode.h>
 
+#include "Context.h"
+
 class GlobalsNode : public MPxNode
 {
 public:
@@ -10,11 +12,16 @@ public:
 
 	static void *creator();
 	static MStatus initialize();
-	static void clean();
 
 	MStatus compute(const MPlug &plug, MDataBlock &dataBlock) override;
 
-	static MObject width;
-	static MObject height;
-	static MObject nbSamples;
+	static const Context &fetchContext();
+	static const Context &getContext();
+
+	static void clean();
+
+private:
+	static Context context;
+
+	static MObject samples;
 };

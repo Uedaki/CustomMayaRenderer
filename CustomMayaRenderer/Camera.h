@@ -11,18 +11,17 @@ class Camera
 public:
 	Camera(const MString &camName);
 
-	Ray getRay(float u, float v);
+	Ray getRay(float s, float t);
 
 private:
 	glm::vec3 origin;
-	glm::vec3 direction;
-	glm::vec3 up;
-	glm::vec3 right;
+	glm::vec3 horizontal;
+	glm::vec3 vertical;
+	glm::vec3 leftCorner;
 
-	glm::vec3 lowerLeft;
+	glm::vec3 u;
+	glm::vec3 v;
 
-	float aspect;
-	float hAperture;
-	float vAperture;
-	float focusDistance;
+	float vLensRadius;
+	float hLensRadius;
 };

@@ -9,67 +9,98 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/intersect.hpp>
+#include <glm/ext.hpp>
+
+#include <algorithm>
+#include <chrono>
 
 #include "HitRecord.h"
+#include "Material.h"
 #include "Ray.h"
 #include "utils.h"
 
-Mesh::Mesh(MFnMesh &obj)
+Mesh::Mesh(MFnMesh &mMesh)
+	: name(mMesh.name().asChar())
 {
-	MDagPath dag;
+
+	MDagPath mDag;
 	MMatrix mMatrix;
-	if (obj.getPath(dag) == MS::kSuccess)
-		mMatrix = dag.inclusiveMatrix();
+	if (mMesh.getPath(mDag) == MS::kSuccess)
+		mMatrix = mDag.inclusiveMatrix();
 
 	MPointArray mVertices;
-	obj.getPoints(mVertices);
-	LOG_MSG("nbr vertice %d", mVertices.length());
+	mMesh.getPoints(mVertices);
+	vertices.resize(mVertices.length());
+	MPoint mLowerBound = mVertices[0] * mMatrix;
+	MPoint mUpperBound = mVertices[0] * mMatrix;
 	for (unsigned int i = 0; i < mVertices.length(); i++)
 	{
 		MPoint point = mVertices[i] * mMatrix;
-		vertices.emplace_back(point[0], point[1], point[3]);
-	}
+		vertices[i] = glm::vec3(point.x, point.y, point.z);
 
-	unsigned int i = 0;
+		mLowerBound.x = std::min(mLowerBound.x, point.x);
+		mLowerBound.y = std::min(mLowerBound.y, point.y);
+		mLowerBound.z = std::min(mLowerBound.z, point.z);
+
+		mUpperBound.x = std::max(mUpperBound.x, point.x);
+		mUpperBound.y = std::max(mUpperBound.y, point.y);
+		mUpperBound.z = std::max(mUpperBound.z, point.z);
+	}
+	setBound(BoundType::LOWER_BOUND, glm::vec3(mLowerBound.x, mLowerBound.y, mLowerBound.z));
+	setBound(BoundType::UPPER_BOUND, glm::vec3(mUpperBound.x, mUpperBound.y, mUpperBound.z));
+
 	MIntArray mTrianglesCount;
 	MIntArray mVerticesIndice;
-	obj.getTriangles(mTrianglesCount, mVerticesIndice);
-	for (unsigned int faceIdx = 0; faceIdx < mTrianglesCount.length(); faceIdx++)
+	mMesh.getTriangles(mTrianglesCount, mVerticesIndice);
+	indices.resize(mVerticesIndice.length());
+	for (unsigned int i = 0; i + 2 < mVerticesIndice.length(); i = i + 3)
 	{
-		unsigned int maxIdx = i + mTrianglesCount[faceIdx];
-		for (; i < maxIdx; i++)
-		{
-			MVector n1;
-			MVector n2;
-			MVector n3;
-			obj.getFaceVertexNormal(faceIdx, i, n1, MSpace::kWorld);
-			obj.getFaceVertexNormal(faceIdx, i, n2, MSpace::kWorld);
-			obj.getFaceVertexNormal(faceIdx, i, n3, MSpace::kWorld);
-			indices.push_back({ mVerticesIndice[i * 3], mVerticesIndice[i * 3 + 1], mVerticesIndice[i * 3 + 2],
-				{ n1.x, n1.y, n1.z }, { n2.x, n2.y, n2.z }, { n3.x, n3.y, n3.z }});
-		}
+		indices[i] = { mVerticesIndice[i], mVerticesIndice[i + 1], mVerticesIndice[i + 2]};
 	}
 
-	LOG_MSG("nbr vertices indices %d", mVerticesIndice.length());
-	LOG_MSG("nbr vertices c indices %d", mTrianglesCount.length());
+	LOG_MSG("Object %s recorded with %d triangles using %d vertices", name, mVerticesIndice.length() / 3, mVertices.length());
+
+
+	MObjectArray mShaderArray;
+	MIntArray mShaderIndices;
+	mMesh.getConnectedShaders(0, mShaderArray, mShaderIndices);
+	if (mShaderArray.length() >= 1)
+	{
+		MFnDependencyNode mShaderWrapperNode(mShaderArray[0]);
+		MString mShaderName = mShaderWrapperNode.name().substring(0, mShaderWrapperNode.name().length() - 3);
+		material = Material::create(mShaderName);
+	}
+	else
+	{
+		material = Material::create();
+	}
 }
 
 bool Mesh::hit(const Ray &ray, float min, float max, HitRecord &record) const
-{
+{ 
+	if (!intersectRay(ray, min, max))
+		return (false);
+
 	bool hasHit = false;
 	for (auto &indice : indices)
-	{
-		float trash;
-		glm::vec2 impactCoord;
-		if (glm::intersectRayTriangle(ray.origin, ray.direction, vertices[indice.a], vertices[indice.b], vertices[indice.c], impactCoord, trash))
+	{		
+		glm::vec3 e1 = vertices[indice.b] - vertices[indice.a];
+		glm::vec3 e2 = vertices[indice.c] - vertices[indice.a];
+		glm::vec3 normal = glm::cross(e1, e2);
+		if (glm::dot(ray.direction, normal) > 0)
+			continue;
+
+		float t;
+		glm::vec2 coord;
+		if (glm::intersectRayTriangle(ray.origin, ray.direction, vertices[indice.a], vertices[indice.b], vertices[indice.c], coord, t))
 		{
-			glm::vec3 impact = vertices[indice.a] + impactCoord.x * vertices[indice.b] + impactCoord.y * vertices[indice.c];
-			float distance = glm::length(impact - ray.origin);
-			if (min < distance && distance < max)
+			if (min < t && t < max)
 			{
-				record.distance = distance;
-				record.normal = indice.na;
-				max = distance;
+				record.distance = t;
+				record.position = vertices[indice.a] + coord.x * e1 + coord.y * e2;
+				record.normal = glm::normalize(normal);
+				record.material = material;
+				max = t;
 				hasHit = true;
 			}
 		}

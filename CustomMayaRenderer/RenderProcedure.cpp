@@ -9,8 +9,8 @@
 #include "Camera.h"
 #include "Collection.h"
 #include "GlobalsNode.h"
-#include "HitRecord.h"
 #include "Ray.h"
+#include "Raytracer.h"
 #include "utils.h"
 
 void *RenderProcedure::creator()
@@ -45,45 +45,34 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 	Camera camera(cameraName);
 	Collection collection;
 
-	glm::vec3 leftCorner(-2, -1, -1);
-	glm::vec3 vertical(0, 2, 0);
-	glm::vec3 horizontal(4, 0, 0);
-	glm::vec3 origin(0, 0, 0);
-
+	const Context &context = GlobalsNode::fetchContext();
 	MRenderView::startRender(width, height);
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			RV_PIXEL pix;
-			float u = static_cast<float>(x) / width;
-			float v = static_cast<float>(y) / height;
-			//Ray ray = camera.getRay(u, v);
-
-			HitRecord record;
-
-			Ray ray;
-			ray.origin = origin;
-			ray.direction = leftCorner + u * horizontal + v * vertical;
-			if (collection.hit(ray, 0.1f, 1000, record))
+			RV_PIXEL pix = {};
+			for (int s = 0; s < context.samples; s++)
 			{
-				//LOG_MSG("hit x: %d y: %d", x, y);
-				//LOG_MSG("distance impact %f", record.distance);
-				pix.r = 128 + record.normal.x * 127;
-				pix.g = 128 + record.normal.y * 127;
-				pix.b = 128 + record.normal.z * 127;
+				float u = static_cast<float>(x + ctmRand()) / width;
+				float v = static_cast<float>(y + ctmRand()) / height;
+
+				Ray ray = camera.getRay(u, v);
+				glm::vec3 color = Raytracer::computeRayColor(ray, collection, 0);
+				pix.r += color[0];
+				pix.g += color[1];
+				pix.b += color[2];
+				pix.a = 255;
 			}
-			else
-			{
-				pix.r = 0;
-				pix.g = 0;
-				pix.b = 0;
-			}
-			pix.a = 255;
+			pix.r = pix.r / context.samples;
+			pix.g = pix.g / context.samples;
+			pix.b = pix.b / context.samples;
 			MRenderView::updatePixels(x, x + 1, y, y + 1, &pix);
 		}
 	}
 	MRenderView::endRender();
+	//Hitable::avgTime();
+	//Mesh::avgTime();
 	return (MS::kSuccess);
 }
 

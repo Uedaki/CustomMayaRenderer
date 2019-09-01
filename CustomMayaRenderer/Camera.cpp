@@ -13,52 +13,40 @@
 #include "Ray.h"
 #include "utils.h"
 
-Camera::Camera(const MString &camName)
+Camera::Camera(const MString &mCameraName)
 {
-	MDagPath dag;
+	MDagPath mDag;
+	MSelectionList mList;
+	mList.add(mCameraName);
+	mList.getDagPath(0, mDag);
 
-	MSelectionList list;
-	list.add(camName);
-	list.getDagPath(0, dag);
-
-	MFnCamera mCamera(dag);
+	MFnCamera mCamera(mDag);
 	MPoint mOrigin = mCamera.eyePoint(MSpace::kWorld);
 	MVector mDirection = mCamera.viewDirection(MSpace::kWorld);
 	MVector mUp = mCamera.upDirection(MSpace::kWorld);
-	MVector mRight = mCamera.rightDirection(MSpace::kWorld);
 	double vFov = mCamera.verticalFieldOfView();
 
 	origin = glm::vec3(mOrigin[0], mOrigin[1], mOrigin[2]);
-	direction = glm::vec3(mDirection[0], mDirection[1], mDirection[2]);
-	up = glm::vec3(mUp.x, mUp.y, mUp.z);
-	right = glm::vec3(mRight.x, mRight.y, mRight.z);
+	glm::vec3 direction = glm::vec3(mDirection[0], mDirection[1], mDirection[2]);
+	glm::vec3 up = glm::vec3(mUp.x, mUp.y, mUp.z);
+	float aspect = static_cast<float>(mCamera.aspectRatio());
 	
-	aspect = static_cast<float>(mCamera.aspectRatio());
-	hAperture = static_cast<float>(mCamera.horizontalFilmAperture());
-	vAperture = static_cast<float>(mCamera.verticalFilmAperture());
-	focusDistance = static_cast<float>(mCamera.focusDistance());
-
-	float theta = static_cast<float>(vFov) * glm::pi<float>() / 180;
+	float theta = static_cast<float>(vFov);
 	float halfHeight = glm::tan(theta / 2);
 	float halfWidth = aspect * halfHeight;
 
-	glm::vec3 w = glm::normalize(origin - direction);
-	glm::vec3 u = glm::normalize(glm::cross(up, w));
-	glm::vec3 v = glm::cross(w, u);
+	glm::vec3 w = -1.0f * glm::normalize(direction);
+	u = glm::normalize(glm::cross(up, w));
+	v = glm::cross(w, u);
 
-	lowerLeft = origin - halfWidth * u - halfHeight * v - w;
-	LOG_MSG("fov %f", vFov);
-	LOG_MSG("Origin {%f, %f, %f}}", origin.x,origin.y, origin.z);
-	LOG_MSG("Up {%f, %f, %f}}", up.x,up.y, up.z);
-	LOG_MSG("Right {%f, %f, %f}}", right.x,right.y, right.z);
-	LOG_MSG("lowerLeft {%f, %f, %f}}", lowerLeft.x,lowerLeft.y, lowerLeft.z);
+	leftCorner = origin - halfWidth * u - halfHeight * v - w;
+	horizontal = 2 * halfWidth * u;
+	vertical = 2 * halfHeight * v;
+
+	LOG_MSG("Camera %s selected", mCameraName.asChar());
 }
 
-Ray Camera::getRay(float u, float v)
+Ray Camera::getRay(float s, float t)
 {
-	Ray ray;
-	ray.origin = origin;
-	ray.direction = lowerLeft + right * u + up * v - origin;
-	//LOG_MSG("ray {%f, %f, %f}}", ray.direction.x, ray.direction.y, ray.direction.z);
-	return (ray);
+	return (Ray(origin, leftCorner + s * horizontal + t * vertical - origin));
 }

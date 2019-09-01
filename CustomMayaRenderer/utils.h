@@ -2,6 +2,8 @@
 
 #include <Maya/MStatus.h>
 
+#include <glm/glm.hpp>
+
 #include <string>
 
 #define LOG_MSG(a, ...) printMsg(a, __VA_ARGS__)
@@ -22,3 +24,9 @@ void printMsg(const char *msg, Args... args)
 
 #define STATUS_CHECK(status) if (status != MS::kSuccess) LOG_MSG(status.errorString().asChar());
 #define STATUS_BARRIER(status) if (status != MS::kSuccess) { LOG_MSG(status.errorString().asChar()); return (MS::kFailure); }
+
+float ctmRand();
+
+glm::vec3 randomUnitDisk();
+
+MStatus getDependencyNodeByName(const MString &name, MObject &node);

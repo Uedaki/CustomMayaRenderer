@@ -2,18 +2,17 @@
 
 #include <vector>
 
-#include "IHitable.h"
 #include "Mesh.h"
 
 struct Ray;
 struct HitRecord;
 
-class Collection : public IHitable
+class Collection
 {
 public:
 	Collection();
 
-	bool hit(const Ray &ray, float min, float max, HitRecord &record) const override;
+	bool hit(const Ray &ray, float min, float max, HitRecord &record) const;
 
 private:
 	std::vector<Mesh> meshes;

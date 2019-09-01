@@ -13,73 +13,64 @@
 const MString GlobalsNode::name("customMayaRendererGlobalsNode");
 const MTypeId GlobalsNode::id(0x7f7f7);
 
-MObject GlobalsNode::width;
-MObject GlobalsNode::height;
-MObject GlobalsNode::nbSamples;
+Context GlobalsNode::context;
 
-namespace
-{
-	MStatus getDependencyNodeByName(const MString &name, MObject &node)
-	{
-		MSelectionList selList;
-		selList.add(name);
-
-		if (selList.isEmpty())
-			return MS::kFailure;
-
-		return selList.getDependNode(0, node);
-	}
-}
+MObject GlobalsNode::samples;
 
 void *GlobalsNode::creator()
 {
-	LOG_MSG("GlobalsNode created");
 	return (new GlobalsNode);
 }
 
 MStatus GlobalsNode::initialize()
 {
-	LOG_MSG("GlobalsNode initialize");
-
 	MStatus status;
 	MFnNumericAttribute numAttr;
 
-	width = numAttr.create("width", "width", MFnNumericData::kInt, 400, &status);
-	if (status != MS::kSuccess)
-		LOG_MSG("Width attribute failed");
-	numAttr.setMin(1);
-	addAttribute(width);
-
-
-	height = numAttr.create("height", "height", MFnNumericData::kInt, 400, &status);
-	if (status != MS::kSuccess)
-		LOG_MSG("Height attribute failed");
-	numAttr.setMin(1);
-	addAttribute(height);
-
-	nbSamples = numAttr.create("nbSample", "nbSample", MFnNumericData::kInt, 10, &status);
+	samples = numAttr.create("samples", "samples", MFnNumericData::kInt, 8, &status);
 	if (status != MS::kSuccess)
 		LOG_MSG("Sample attribute failed");
 	numAttr.setMin(1);
-	addAttribute(nbSamples);
+	numAttr.setSoftMax(1024);
+	numAttr.setReadable(true);
+	numAttr.setWritable(true);
+	numAttr.setKeyable(true);
+	numAttr.setStorable(true);
+	addAttribute(samples);
 
 	return (MS::kSuccess);
-}
-
-void GlobalsNode::clean()
-{
-	MObject obj;
-	if (getDependencyNodeByName(GlobalsNode::name, obj) != MS::kSuccess)
-		return;
-	
-	MDGModifier modifier;
-	modifier.deleteNode(obj);
 }
 
 MStatus GlobalsNode::compute(const MPlug &plug, MDataBlock &data)
 {
-	LOG_MSG("Compute");
-	LOG_MSG("%d", data.inputValue(width).asInt());
-	LOG_MSG("%d", data.inputValue(height).asInt());
 	return (MS::kSuccess);
+}
+
+const Context &GlobalsNode::fetchContext()
+{
+	MObject mObj;
+	if (getDependencyNodeByName(GlobalsNode::name, mObj) != MS::kSuccess)
+		return (context);
+
+	MPlug mPlug(mObj, samples);
+	mPlug.getValue(context.samples);
+	LOG_MSG("sample %d", context.samples);
+
+	return (context);
+}
+
+const Context &GlobalsNode::getContext()
+{
+	return (context);
+}
+
+void GlobalsNode::clean()
+{
+	MObject mObj;
+	getDependencyNodeByName(GlobalsNode::name, mObj);
+	MDGModifier modifier;
+	modifier.deleteNode(samples);
+	modifier.doIt();
+	modifier.deleteNode(mObj);
+	modifier.doIt();
 }

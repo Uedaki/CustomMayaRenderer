@@ -7,41 +7,24 @@ def createGlobalsNode():
     if mc.objExists("customMayaRendererGlobalsNode"):
         return
 
-    selection = mc.ls(sl = True)
-
     mc.createNode(
         "customMayaRendererGlobalsNode",
         name = "customMayaRendererGlobalsNode",
         shared = True,
         skipSelect = True)
 
-    mc.lockNode("customMayaRendererGlobalsNode")
-    mc.select(selection, replace = True)
-
-
-class CustomMayaRendererGenericTab(object):
-
-    def __init__(self):
-        self._uis = {}
-
-    def _addControl(self, ui, attrName, connectIndex=2):
-        self._uis[attrName] = ui
-        attr = pm.Attribute("customMayaRendererGlobalsNode." + attrName)
-        pm.connectControl(ui, attr, index=connectIndex)
-
-    def _getAttributeMenuItems(self, attrName):
-        attr = pm.Attribute("customMayaRendererGlobalsNode." + attrName)
-        menuItems = [
-            (i, v) for i, v in enumerate(attr.getEnums().keys())
-        ]
-        return menuItems
-
-
 def createRenderTabsMelProcedure():
     pm.mel.source("createMayaSoftwareCommonGlobalsTab.mel")
 
     mel.eval('''
-    global proc customMayaRendererCreateCommonTabProcedure()
+    global proc customMayaRendererUpdateCommonTabProcedure()
+    {
+        updateMayaSoftwareCommonGlobalsTab();
+    }
+    ''')
+
+    mel.eval('''
+    global proc customMayaRendererCreateMainTabProcedure()
     {
         python("import CustomMayaRenderer.globalsNode");
         python("CustomMayaRenderer.globalsNode.g_customMayaRendererCommonTab.create()");
@@ -61,12 +44,12 @@ def renderBuildSettingsCallback(renderer):
                 addGlobalsTab = (
                     "Common",
                     "createMayaSoftwareCommonGlobalsTab",
-                    "customMayaRendererEmptyUpdateProcedure"))
+                    "customMayaRendererUpdateCommonTabProcedure"))
 
     pm.renderer("customMayaRenderer", edit = True,
                 addGlobalsTab = (
                     "CustomMayaRenderer",
-                    "customMayaRendererCreateCommonTabProcedure",
+                    "customMayaRendererCreateMainTabProcedure",
                     "customMayaRendererEmptyUpdateProcedure"))
 
 
@@ -74,7 +57,7 @@ def addRenderGlobalsScriptJob():
     mc.scriptJob(
     attributeChange=[
         "defaultRenderGlobals.currentRenderer",
-        "import appleseedMaya.renderGlobals; appleseedMaya.renderGlobals.currentRendererChanged()"])
+        "import CustomMayaRenderer.globalsNode; CustomMayaRenderer.globalsNode.currentRendererChanged()"])
 
 
 def currentRendererChanged():
@@ -83,6 +66,27 @@ def currentRendererChanged():
         return
 
     createGlobalsNode()
+
+    #if not mc.window("unifiedRenderGlobalsWindow", exists=True):
+    #    mel.eval("unifiedRenderGlobalsWindow")
+    #    mc.window("unifiedRenderGlobalsWindow", edit=True, visible=False)
+
+
+class CustomMayaRendererGenericTab(object):
+
+    def __init__(self):
+        self._uis = {}
+
+    def _addControl(self, ui, attrName, connectIndex=2):
+        self._uis[attrName] = ui
+        pm.connectControl(ui, "customMayaRendererGlobalsNode." + attrName, index=connectIndex)
+
+    def _getAttributeMenuItems(self, attrName):
+        attr = pm.Attribute("customMayaRendererGlobalsNode." + attrName)
+        menuItems = [
+            (i, v) for i, v in enumerate(attr.getEnums().keys())
+        ]
+        return menuItems
 
 
 class CustomMayaRendererCommonTab(CustomMayaRendererGenericTab):
@@ -103,26 +107,16 @@ class CustomMayaRendererCommonTab(CustomMayaRendererGenericTab):
 
                         pm.separator(height=2)
 
-                        self._addControl(
-                            ui=pm.intFieldGrp(
-                                label="Width",
-                                columnWidth=(3, 160),
-                                columnAttach=(1, "right", 4)),
-                            attrName="width")
+                        pm.attrFieldSliderGrp(
+                                label = "Number of samples:",
+                                columnWidth = (3, 160),
+                                columnAttach= (1, "left", 4),
+                                minValue = 1,
+                                maxValue = 100,
+                                fieldMinValue = 1,
+                                fieldMaxValue = 100,
+                                attribute = "customMayaRendererGlobalsNode.samples")
 
-                        self._addControl(
-                            ui=pm.intFieldGrp(
-                                label="Height",
-                                columnWidth=(3, 160),
-                                columnAttach=(1, "right", 4)),
-                            attrName="height")
-
-                        self._addControl(
-                            ui=pm.intFieldGrp(
-                                label="Samples",
-                                columnWidth=(3, 160),
-                                columnAttach=(1, "right", 4)),
-                            attrName="nbSample")
 
         pm.setUITemplate("renderGlobalsTemplate", popTemplate=True)
         pm.setUITemplate("attributeEditorTemplate", popTemplate=True)
@@ -135,5 +129,7 @@ class CustomMayaRendererCommonTab(CustomMayaRendererGenericTab):
                 ("customMayaRendererScrollLayout", "left", 0),
                 ("customMayaRendererScrollLayout", "right", 0)])
 
+    def update(self):
+        assert mc.objExists("customMayaRendererGlobalsNode");
 
 g_customMayaRendererCommonTab = CustomMayaRendererCommonTab()

@@ -5,7 +5,6 @@
 #include <Maya/MFnMesh.h>
 
 #include "HitRecord.h"
-#include "Ray.h"
 
 Collection::Collection()
 {
@@ -22,10 +21,16 @@ Collection::Collection()
 
 bool Collection::hit(const Ray &ray, float min, float max, HitRecord &record) const
 {
+	bool hasHit = false;
+	HitRecord tmpRecord;
+	tmpRecord.distance = max;
 	for (auto &mesh : meshes)
 	{
-		if (mesh.hit(ray, min, max, record))
-			return (true);
+		if (mesh.hit(ray, min, tmpRecord.distance, tmpRecord))
+		{
+			record = tmpRecord;
+			hasHit = true;
+		}
 	}
-	return (false);
+	return (hasHit);
 }
