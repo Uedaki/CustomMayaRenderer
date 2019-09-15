@@ -242,6 +242,9 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collection.h" />
     <ClInclude Include="Context.h" />
+    <ClInclude Include="DielectricMaterial.h" />
+    <ClInclude Include="DielectricNode.h" />
+    <ClInclude Include="DielectricShader.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GlobalsNode.h" />
     <ClInclude Include="Hitable.h" />
@@ -251,6 +254,9 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClInclude Include="LambertShader.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MetalMaterial.h" />
+    <ClInclude Include="MetalNode.h" />
+    <ClInclude Include="MetalShader.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Raytracer.h" />
@@ -262,6 +268,9 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collection.cpp" />
+    <ClCompile Include="DielectricMaterial.cpp" />
+    <ClCompile Include="DielectricNode.cpp" />
+    <ClCompile Include="DielectricShader.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GlobalNode.cpp" />
     <ClCompile Include="Hitable.cpp" />
@@ -271,6 +280,9 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClCompile Include="mainPlugin.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MetalMaterial.cpp" />
+    <ClCompile Include="MetalNode.cpp" />
+    <ClCompile Include="MetalShader.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

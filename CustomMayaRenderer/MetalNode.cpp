@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "LambertNode.h"
+#include "MetalNode.h"
 
 #include <Maya/MFloatVector.h>
 #include <Maya/MFnNumericAttribute.h>
@@ -9,47 +9,48 @@
 
 #include "utils.h"
 
-const MString LambertNode::name("customLambert");
-const MTypeId LambertNode::id(0x7f7f8);
+const MString MetalNode::name("customMetal");
+const MTypeId MetalNode::id(0x7f7f9);
 
-MObject  LambertNode::nameData;
-MObject  LambertNode::nameAttr;
+MObject  MetalNode::nameData;
+MObject  MetalNode::nameAttr;
 
-MObject  LambertNode::aAlbedo;
-MObject  LambertNode::aAlbedoR;
-MObject  LambertNode::aAlbedoG;
-MObject  LambertNode::aAlbedoB;
-MObject  LambertNode::aOutColor;
-MObject  LambertNode::aOutColorR;
-MObject  LambertNode::aOutColorG;
-MObject  LambertNode::aOutColorB;
+MObject  MetalNode::aAlbedo;
+MObject  MetalNode::aAlbedoR;
+MObject  MetalNode::aAlbedoG;
+MObject  MetalNode::aAlbedoB;
+MObject  MetalNode::aFuzz;
+MObject  MetalNode::aOutColor;
+MObject  MetalNode::aOutColorR;
+MObject  MetalNode::aOutColorG;
+MObject  MetalNode::aOutColorB;
 
-MObject  LambertNode::aNormalCamera;
-MObject  LambertNode::aNormalCameraX;
-MObject  LambertNode::aNormalCameraY;
-MObject  LambertNode::aNormalCameraZ;
-MObject  LambertNode::aLightData;
-MObject  LambertNode::aLightDirection;
-MObject  LambertNode::aLightDirectionX;
-MObject  LambertNode::aLightDirectionY;
-MObject  LambertNode::aLightDirectionZ;
-MObject  LambertNode::aLightIntensity;
-MObject  LambertNode::aLightIntensityR;
-MObject  LambertNode::aLightIntensityG;
-MObject  LambertNode::aLightIntensityB;
-MObject  LambertNode::aLightAmbient;
-MObject  LambertNode::aLightDiffuse;
-MObject  LambertNode::aLightSpecular;
-MObject  LambertNode::aLightShadowFraction;
-MObject  LambertNode::aPreShadowIntensity;
-MObject  LambertNode::aLightBlindData;
+MObject  MetalNode::aNormalCamera;
+MObject  MetalNode::aNormalCameraX;
+MObject  MetalNode::aNormalCameraY;
+MObject  MetalNode::aNormalCameraZ;
+MObject  MetalNode::aLightData;
+MObject  MetalNode::aLightDirection;
+MObject  MetalNode::aLightDirectionX;
+MObject  MetalNode::aLightDirectionY;
+MObject  MetalNode::aLightDirectionZ;
+MObject  MetalNode::aLightIntensity;
+MObject  MetalNode::aLightIntensityR;
+MObject  MetalNode::aLightIntensityG;
+MObject  MetalNode::aLightIntensityB;
+MObject  MetalNode::aLightAmbient;
+MObject  MetalNode::aLightDiffuse;
+MObject  MetalNode::aLightSpecular;
+MObject  MetalNode::aLightShadowFraction;
+MObject  MetalNode::aPreShadowIntensity;
+MObject  MetalNode::aLightBlindData;
 
-void *LambertNode::creator()
+void *MetalNode::creator()
 {
-	return (new LambertNode);
+	return (new MetalNode);
 }
 
-MStatus LambertNode::initialize()
+MStatus MetalNode::initialize()
 {
 	MStatus status;
 	MFnNumericAttribute nAttr;
@@ -84,6 +85,12 @@ MStatus LambertNode::initialize()
 	CHECK_MSTATUS(nAttr.setStorable(true));
 	CHECK_MSTATUS(nAttr.setDefault(0.0f, 0.58824f, 0.644f));
 	CHECK_MSTATUS(nAttr.setUsedAsColor(true));
+
+	aFuzz = nAttr.create("fuzz", "f", MFnNumericData::kFloat, 0.3f, &status);
+	CHECK_MSTATUS(nAttr.setMin(0));
+	CHECK_MSTATUS(nAttr.setMax(1));
+	CHECK_MSTATUS(nAttr.setKeyable(true));
+	CHECK_MSTATUS(nAttr.setStorable(true));
 
 	aOutColorR = nAttr.create("outColorR", "ocr", MFnNumericData::kFloat, 0, &status);
 	CHECK_MSTATUS(status);
@@ -273,6 +280,7 @@ MStatus LambertNode::initialize()
 
 	CHECK_MSTATUS(addAttribute(nameAttr));
 	CHECK_MSTATUS(addAttribute(aAlbedo));
+	CHECK_MSTATUS(addAttribute(aFuzz));
 	CHECK_MSTATUS(addAttribute(aOutColor));
 	CHECK_MSTATUS(addAttribute(aNormalCamera));
 	CHECK_MSTATUS(addAttribute(aLightData));
@@ -300,7 +308,7 @@ MStatus LambertNode::initialize()
 	return(MS::kSuccess);
 }
 
-MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
+MStatus MetalNode::compute(const MPlug &plug, MDataBlock &block)
 {
 	MStatus status;
 	MFloatVector resultColor(0.0, 0.0, 0.0);
@@ -308,11 +316,16 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 	MFloatVector &surfaceColor = block.inputValue(aAlbedo,
 		&status).asFloatVector();
 	CHECK_MSTATUS(status);
-	resultColor = surfaceColor;
 
 	MFloatVector &surfaceNormal = block.inputValue(aNormalCamera,
 		&status).asFloatVector();
 	CHECK_MSTATUS(status);
+
+	float fuzz = block.inputValue(aFuzz,
+		&status).asFloat();
+	CHECK_MSTATUS(status);
+
+	resultColor = surfaceColor;
 
 	// start
 	MArrayDataHandle lightData = block.inputArrayValue(aLightData,
@@ -349,7 +362,6 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 			resultColor += lightIntensity;
 		}
 
-
 		// Find diffuse component
 		//
 		if (currentLight.child(aLightDiffuse).asBool())
@@ -360,7 +372,7 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 
 			if (cosln > 0.0f) {
 				resultColor += lightIntensity
-					* (cosln);
+					* (cosln * fuzz);
 			}
 		}
 
@@ -380,6 +392,7 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 	resultColor[1] = resultColor[1] * surfaceColor[1];
 	resultColor[2] = resultColor[2] * surfaceColor[2];
 
+
 	if (plug == aOutColor || plug == aOutColorR || plug == aOutColorG
 		|| plug == aOutColorB)
 	{
@@ -394,7 +407,7 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 	return(MS::kSuccess);
 }
 
-void LambertNode::postConstructor()
+void MetalNode::postConstructor()
 {
 	setMPSafe(true);
 }

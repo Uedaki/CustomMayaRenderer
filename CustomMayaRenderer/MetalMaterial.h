@@ -2,16 +2,17 @@
 
 #include "Material.h"
 
-class LambertMaterial : public Material
+class MetalMaterial : public Material
 {
 public:
 	static Material *create(MObject mShaderNode);
 
-	LambertMaterial() = default;
-	LambertMaterial(const glm::vec3 &newAlbedo);
+	MetalMaterial() = default;
+	MetalMaterial(const glm::vec3 &newAlbedo);
 
 	bool scatter(const Ray &ray, const HitRecord &hit, glm::vec3 &attenuation, Ray &scattered) const override;
 
 private:
 	glm::vec3 albedo = {};
+	float fuzz = 0;
 };

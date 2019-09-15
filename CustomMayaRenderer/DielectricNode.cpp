@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "LambertNode.h"
+#include "DielectricNode.h"
 
 #include <Maya/MFloatVector.h>
 #include <Maya/MFnNumericAttribute.h>
@@ -9,47 +9,55 @@
 
 #include "utils.h"
 
-const MString LambertNode::name("customLambert");
-const MTypeId LambertNode::id(0x7f7f8);
+const MString DielectricNode::name("customDielectric");
+const MTypeId DielectricNode::id(0x7f800);
 
-MObject  LambertNode::nameData;
-MObject  LambertNode::nameAttr;
+MObject  DielectricNode::nameData;
+MObject  DielectricNode::nameAttr;
 
-MObject  LambertNode::aAlbedo;
-MObject  LambertNode::aAlbedoR;
-MObject  LambertNode::aAlbedoG;
-MObject  LambertNode::aAlbedoB;
-MObject  LambertNode::aOutColor;
-MObject  LambertNode::aOutColorR;
-MObject  LambertNode::aOutColorG;
-MObject  LambertNode::aOutColorB;
+MObject  DielectricNode::aRefraction;
 
-MObject  LambertNode::aNormalCamera;
-MObject  LambertNode::aNormalCameraX;
-MObject  LambertNode::aNormalCameraY;
-MObject  LambertNode::aNormalCameraZ;
-MObject  LambertNode::aLightData;
-MObject  LambertNode::aLightDirection;
-MObject  LambertNode::aLightDirectionX;
-MObject  LambertNode::aLightDirectionY;
-MObject  LambertNode::aLightDirectionZ;
-MObject  LambertNode::aLightIntensity;
-MObject  LambertNode::aLightIntensityR;
-MObject  LambertNode::aLightIntensityG;
-MObject  LambertNode::aLightIntensityB;
-MObject  LambertNode::aLightAmbient;
-MObject  LambertNode::aLightDiffuse;
-MObject  LambertNode::aLightSpecular;
-MObject  LambertNode::aLightShadowFraction;
-MObject  LambertNode::aPreShadowIntensity;
-MObject  LambertNode::aLightBlindData;
+MObject  DielectricNode::aOutColor;
+MObject  DielectricNode::aOutColorR;
+MObject  DielectricNode::aOutColorG;
+MObject  DielectricNode::aOutColorB;
 
-void *LambertNode::creator()
+MObject  DielectricNode::aInTransparency;
+MObject  DielectricNode::aInTransR;
+MObject  DielectricNode::aInTransG;
+MObject  DielectricNode::aInTransB;
+
+MObject  DielectricNode::aOutTransparency;
+MObject  DielectricNode::aOutTransR;
+MObject  DielectricNode::aOutTransG;
+MObject  DielectricNode::aOutTransB;
+
+MObject  DielectricNode::aNormalCamera;
+MObject  DielectricNode::aNormalCameraX;
+MObject  DielectricNode::aNormalCameraY;
+MObject  DielectricNode::aNormalCameraZ;
+MObject  DielectricNode::aLightData;
+MObject  DielectricNode::aLightDirection;
+MObject  DielectricNode::aLightDirectionX;
+MObject  DielectricNode::aLightDirectionY;
+MObject  DielectricNode::aLightDirectionZ;
+MObject  DielectricNode::aLightIntensity;
+MObject  DielectricNode::aLightIntensityR;
+MObject  DielectricNode::aLightIntensityG;
+MObject  DielectricNode::aLightIntensityB;
+MObject  DielectricNode::aLightAmbient;
+MObject  DielectricNode::aLightDiffuse;
+MObject  DielectricNode::aLightSpecular;
+MObject  DielectricNode::aLightShadowFraction;
+MObject  DielectricNode::aPreShadowIntensity;
+MObject  DielectricNode::aLightBlindData;
+
+void *DielectricNode::creator()
 {
-	return (new LambertNode);
+	return (new DielectricNode);
 }
 
-MStatus LambertNode::initialize()
+MStatus DielectricNode::initialize()
 {
 	MStatus status;
 	MFnNumericAttribute nAttr;
@@ -62,27 +70,23 @@ MStatus LambertNode::initialize()
 	nameAttr = typedAttr.create("materialName", "mn", MFnData::kString, nameData, &status);
 	CHECK_MSTATUS(typedAttr.setWritable(false));
 
-	aAlbedoR = nAttr.create("albedoR", "ar", MFnNumericData::kFloat, 0,
-		&status);
-	CHECK_MSTATUS(status);
+	aRefraction = nAttr.create("refraction", "r", MFnNumericData::kFloat, 1.6f, &status);
+	CHECK_MSTATUS(nAttr.setMin(0));
+	CHECK_MSTATUS(nAttr.setMax(100));
 	CHECK_MSTATUS(nAttr.setKeyable(true));
 	CHECK_MSTATUS(nAttr.setStorable(true));
-	CHECK_MSTATUS(nAttr.setDefault(0.0f));
-	aAlbedoG = nAttr.create("albedoG", "ag", MFnNumericData::kFloat, 0, &status);
+
+	aInTransR = nAttr.create("transparencyR", "itr", MFnNumericData::kFloat, 0, &status);
 	CHECK_MSTATUS(status);
-	CHECK_MSTATUS(nAttr.setKeyable(true));
-	CHECK_MSTATUS(nAttr.setStorable(true));
-	CHECK_MSTATUS(nAttr.setDefault(0.58824f));
-	aAlbedoB = nAttr.create("albedoB", "ab", MFnNumericData::kFloat, 0, &status);
+	aInTransG = nAttr.create("transparencyG", "itg", MFnNumericData::kFloat, 0, &status);
 	CHECK_MSTATUS(status);
-	CHECK_MSTATUS(nAttr.setKeyable(true));
-	CHECK_MSTATUS(nAttr.setStorable(true));
-	CHECK_MSTATUS(nAttr.setDefault(0.644f));
-	aAlbedo = nAttr.create("albedo", "a", aAlbedoR, aAlbedoG, aAlbedoB, &status);
+	aInTransB = nAttr.create("transparencyB", "itb", MFnNumericData::kFloat, 0, &status);
 	CHECK_MSTATUS(status);
-	CHECK_MSTATUS(nAttr.setKeyable(true));
-	CHECK_MSTATUS(nAttr.setStorable(true));
-	CHECK_MSTATUS(nAttr.setDefault(0.0f, 0.58824f, 0.644f));
+	aInTransparency = nAttr.create("transparency", "it", aInTransR, aInTransG, aInTransB, &status);
+	CHECK_MSTATUS(status);
+	//CHECK_MSTATUS(nAttr.setWritable(false));
+	CHECK_MSTATUS(nAttr.setHidden(true));
+	CHECK_MSTATUS(nAttr.setDefault(0.85, 0.85, 0.85));
 	CHECK_MSTATUS(nAttr.setUsedAsColor(true));
 
 	aOutColorR = nAttr.create("outColorR", "ocr", MFnNumericData::kFloat, 0, &status);
@@ -93,6 +97,28 @@ MStatus LambertNode::initialize()
 	CHECK_MSTATUS(status);
 	aOutColor = nAttr.create("outColor", "oc", aOutColorR, aOutColorG, aOutColorB, &status);
 	CHECK_MSTATUS(status);
+	CHECK_MSTATUS(nAttr.setHidden(false));
+	CHECK_MSTATUS(nAttr.setReadable(true));
+	CHECK_MSTATUS(nAttr.setWritable(false));
+
+	// Transparency Output
+//
+	aOutTransR = nAttr.create("outTransparencyR", "otr",
+		MFnNumericData::kFloat, 0, &status);
+	CHECK_MSTATUS(status);
+
+	aOutTransG = nAttr.create("outTransparencyG", "otg",
+		MFnNumericData::kFloat, 0, &status);
+	CHECK_MSTATUS(status);
+
+	aOutTransB = nAttr.create("outTransparencyB", "otb",
+		MFnNumericData::kFloat, 0, &status);
+	CHECK_MSTATUS(status);
+
+	aOutTransparency = nAttr.create("outTransparency", "ot",
+		aOutTransR, aOutTransG, aOutTransB, &status);
+	CHECK_MSTATUS(status);
+
 	CHECK_MSTATUS(nAttr.setHidden(false));
 	CHECK_MSTATUS(nAttr.setReadable(true));
 	CHECK_MSTATUS(nAttr.setWritable(false));
@@ -272,15 +298,19 @@ MStatus LambertNode::initialize()
 		true, true, false, 1.0f, 1.0f, NULL));
 
 	CHECK_MSTATUS(addAttribute(nameAttr));
-	CHECK_MSTATUS(addAttribute(aAlbedo));
+	CHECK_MSTATUS(addAttribute(aRefraction));
 	CHECK_MSTATUS(addAttribute(aOutColor));
+	CHECK_MSTATUS(addAttribute(aInTransparency));
+	CHECK_MSTATUS(addAttribute(aOutTransparency));
 	CHECK_MSTATUS(addAttribute(aNormalCamera));
 	CHECK_MSTATUS(addAttribute(aLightData));
 
-	CHECK_MSTATUS(attributeAffects(aAlbedoR, aOutColor));
-	CHECK_MSTATUS(attributeAffects(aAlbedoG, aOutColor));
-	CHECK_MSTATUS(attributeAffects(aAlbedoB, aOutColor));
-	CHECK_MSTATUS(attributeAffects(aAlbedo, aOutColor));
+	CHECK_MSTATUS(attributeAffects(aNormalCamera, aOutColor));
+	CHECK_MSTATUS(attributeAffects(aInTransR, aOutTransparency));
+	CHECK_MSTATUS(attributeAffects(aInTransG, aOutTransparency));
+	CHECK_MSTATUS(attributeAffects(aInTransB, aOutTransparency));
+	CHECK_MSTATUS(attributeAffects(aInTransparency, aOutTransparency));
+	CHECK_MSTATUS(attributeAffects(aInTransparency, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aNormalCameraX, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aNormalCameraY, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aNormalCameraZ, aOutColor));
@@ -300,19 +330,17 @@ MStatus LambertNode::initialize()
 	return(MS::kSuccess);
 }
 
-MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
+MStatus DielectricNode::compute(const MPlug &plug, MDataBlock &block)
 {
 	MStatus status;
 	MFloatVector resultColor(0.0, 0.0, 0.0);
 
-	MFloatVector &surfaceColor = block.inputValue(aAlbedo,
-		&status).asFloatVector();
-	CHECK_MSTATUS(status);
-	resultColor = surfaceColor;
-
+	
 	MFloatVector &surfaceNormal = block.inputValue(aNormalCamera,
 		&status).asFloatVector();
 	CHECK_MSTATUS(status);
+
+	resultColor = MFloatVector(1, 1, 1);
 
 	// start
 	MArrayDataHandle lightData = block.inputArrayValue(aLightData,
@@ -349,7 +377,6 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 			resultColor += lightIntensity;
 		}
 
-
 		// Find diffuse component
 		//
 		if (currentLight.child(aLightDiffuse).asBool())
@@ -360,7 +387,7 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 
 			if (cosln > 0.0f) {
 				resultColor += lightIntensity
-					* (cosln);
+					* (cosln * 0.1);
 			}
 		}
 
@@ -376,9 +403,9 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 
 	// Factor incident light with surface color and add incandescence
 	//
-	resultColor[0] = resultColor[0] * surfaceColor[0];
-	resultColor[1] = resultColor[1] * surfaceColor[1];
-	resultColor[2] = resultColor[2] * surfaceColor[2];
+	resultColor[0] = resultColor[0];
+	resultColor[1] = resultColor[1];
+	resultColor[2] = resultColor[2];
 
 	if (plug == aOutColor || plug == aOutColorR || plug == aOutColorG
 		|| plug == aOutColorB)
@@ -391,10 +418,32 @@ MStatus LambertNode::compute(const MPlug &plug, MDataBlock &block)
 		outColor = resultColor;
 		outColorHandle.setClean();
 	}
+
+	// Set ouput transparency
+	//
+	if (plug == aOutTransparency || plug == aOutTransR
+		|| plug == aOutTransG || plug == aOutTransB)
+	{
+		MFloatVector &transparency = block.inputValue(
+			aInTransparency, &status).asFloatVector();
+		CHECK_MSTATUS(status);
+
+
+		// Get the handle to the attribute
+		//
+		MDataHandle outTransHandle = block.outputValue(
+			aOutTransparency, &status);
+		CHECK_MSTATUS(status);
+		MFloatVector &outTrans = outTransHandle.asFloatVector();
+
+		outTrans = transparency;   // Set the output value
+		outTransHandle.setClean(); // Mark the output value as clean
+	}
+
 	return(MS::kSuccess);
 }
 
-void LambertNode::postConstructor()
+void DielectricNode::postConstructor()
 {
 	setMPSafe(true);
 }

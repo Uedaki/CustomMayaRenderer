@@ -20,21 +20,22 @@ MHWRender::DrawAPI LambertShader::supportedDrawAPIs() const
 
 MString LambertShader::fragmentName() const
 {
-	return ("mayaLambert");
+	return ("mayaLambertSurface");
 }
 
 void LambertShader::getCustomMappings(MHWRender::MAttributeParameterMappingList &mappings)
 {
 	MHWRender::MAttributeParameterMapping diffuseMapping(
-		"diffuse", "diffuseReflectivity", true, true);
+		"color", "outColor", true, true);
 	mappings.append(diffuseMapping);
-
-	MHWRender::MAttributeParameterMapping translucenceMapping(
-		"translucence", "translucenceCoeff", true, true);
-	mappings.append(translucenceMapping);
 }
 
 MString LambertShader::primaryColorParameter() const
 {
-	return ("color");
+	return ("outColor");
+}
+
+MString LambertShader::bumpAttribute() const
+{
+	return ("normalCamera");
 }

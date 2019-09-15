@@ -37,6 +37,7 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 		LOG_MSG("Wrong number of argument passed to render procedure");
 		return (MS::kFailure);
 	}
+
 	argsData.getFlagArgument("-width", 0, width);
 	argsData.getFlagArgument("-height", 0, height);
 	argsData.getFlagArgument("-camera", 0, cameraName);
@@ -47,6 +48,7 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 
 	const Context &context = GlobalsNode::fetchContext();
 	MRenderView::startRender(width, height);
+	LOG_MSG("Start rendering");
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)

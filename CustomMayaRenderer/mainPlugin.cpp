@@ -9,16 +9,16 @@
 #include <Maya/MFnPlugin.h>
 #include <Maya/MPxCommand.h>
 
+#include "DielectricNode.h"
+#include "DielectricShader.h"
 #include "GlobalsNode.h"
 #include "LambertNode.h"
 #include "LambertShader.h"
+#include "MetalNode.h"
+#include "MetalShader.h"
 #include "RenderProcedure.h"
 #include "RenderRegionProcedure.h"
 #include "utils.h"
-
-static const MString sRegistrantId(LambertNode::name);
-static const MString sDrawDBClassification("drawdb/shader/surface/" + LambertNode::name);
-static const MString sFullClassification("shader/surface:" + sDrawDBClassification);
 
 MStatus initializePlugin(MObject obj)
 {
@@ -32,17 +32,20 @@ MStatus initializePlugin(MObject obj)
 	STATUS_BARRIER(MGlobal::executePythonCommand("import CustomMayaRenderer", false, false));
 	STATUS_BARRIER(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.register()", false, false));
 
-	MString command("if( `window -exists createRenderNodeWindow` ) {refreshCreateRenderNodeWindow(\"");
+	MString sDrawLambertDBClassification("drawdb/shader/surface/" + LambertNode::name);
+	MString sLambertFullClassification("shader/surface:" + sDrawLambertDBClassification);
+	plugin.registerNode(LambertNode::name, LambertNode::id, LambertNode::creator, LambertNode::initialize, MPxNode::kDependNode, &sLambertFullClassification);
+	MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(sDrawLambertDBClassification, LambertNode::name, LambertShader::creator);
 
-	plugin.registerNode(LambertNode::name, LambertNode::id, LambertNode::creator, LambertNode::initialize, MPxNode::kDependNode, &sFullClassification);
-	MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(sDrawDBClassification, sRegistrantId, LambertShader::creator);
+	MString sDrawMetalDBClassification("drawdb/shader/surface/" + MetalNode::name);
+	MString sMetalFullClassification("shader/surface:" + sDrawMetalDBClassification);
+	plugin.registerNode(MetalNode::name, MetalNode::id, MetalNode::creator, MetalNode::initialize, MPxNode::kDependNode, &sMetalFullClassification);
+	MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(sDrawMetalDBClassification, MetalNode::name, MetalShader::creator);
 
-	command += sFullClassification;
-
-	command += "\");}\n";
-
-	CHECK_MSTATUS(MGlobal::executeCommand(command));
-
+	MString sDrawDielectricDBClassification("drawdb/shader/surface/" + DielectricNode::name);
+	MString sDielectricFullClassification("shader/surface:" + sDrawDielectricDBClassification);
+	plugin.registerNode(DielectricNode::name, DielectricNode::id, DielectricNode::creator, DielectricNode::initialize, MPxNode::kDependNode, &sDielectricFullClassification);
+	MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(sDrawDielectricDBClassification, DielectricNode::name, DielectricShader::creator);
 
 	LOG_MSG("Plugin loaded successfully");
 	return (MS::kSuccess);
@@ -60,13 +63,17 @@ MStatus uninitializePlugin(MObject obj)
 
 	MString command("if( `window -exists createRenderNodeWindow` ) {refreshCreateRenderNodeWindow(\"");
 
+	MString sDrawLambertDBClassification("drawdb/shader/surface/" + LambertNode::name);
 	plugin.deregisterNode(LambertNode::id);
-	MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(sDrawDBClassification, sRegistrantId);
+	MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(sDrawLambertDBClassification, LambertNode::name);
 
-	command += sFullClassification;
-	command += "\");}\n";
+	MString sDrawMetalDBClassification("drawdb/shader/surface/" + MetalNode::name);
+	plugin.deregisterNode(MetalNode::id);
+	MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(sDrawMetalDBClassification, MetalNode::name);
 
-	CHECK_MSTATUS(MGlobal::executeCommand(command));
+	MString sDrawDielectricDBClassification("drawdb/shader/surface/" + DielectricNode::name);
+	plugin.deregisterNode(DielectricNode::id);
+	MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(sDrawDielectricDBClassification, DielectricNode::name);
 
 	STATUS_CHECK(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.unregister()", false, false));
 

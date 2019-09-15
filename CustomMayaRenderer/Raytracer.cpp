@@ -17,7 +17,9 @@ glm::vec3 Raytracer::computeRayColor(const Ray &ray, const Collection &collectio
 	{
 		Ray scattered;
 		glm::vec3 attenuation = {};
-		if (depth < 50 && record.material->scatter(ray, record, attenuation, scattered))
+		if (!record.material)
+			LOG_MSG("Missing material parameter");
+		if (depth < 50 && record.material && record.material->scatter(ray, record, attenuation, scattered))
 			color = attenuation * computeRayColor(scattered, collection, depth + 1);
 		else
 			return (glm::vec3(0, 0, 0));

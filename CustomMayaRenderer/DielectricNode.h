@@ -2,9 +2,9 @@
 
 #include <Maya/MPxNode.h>
 
-class LambertMaterial;
+class DielectricMaterial;
 
-class LambertNode : public MPxNode
+class DielectricNode : public MPxNode
 {
 public:
 	static const MString name;
@@ -17,24 +17,28 @@ public:
 	void postConstructor() override;
 
 private:
-	friend class LambertMaterial;
+	friend class DielectricMaterial;
 
 	static MObject nameData;
 	static MObject nameAttr;
 
-	static MObject  aAlbedoR;
-	static MObject  aAlbedoG;
-	static MObject  aAlbedoB;
-	static MObject  aAlbedo;
+	static MObject  aTranslucenceCoeff;
+
+	static MObject  aRefraction;
 
 	static MObject  aOutColorR;
 	static MObject  aOutColorG;
 	static MObject  aOutColorB;
 	static MObject  aOutColor;
 
-	static MObject  aOutTransparencyR;
-	static MObject  aOutTransparencyG;
-	static MObject  aOutTransparencyB;
+	static MObject  aInTransR;
+	static MObject  aInTransG;
+	static MObject  aInTransB;
+	static MObject  aInTransparency;
+
+	static MObject  aOutTransR;
+	static MObject  aOutTransG;
+	static MObject  aOutTransB;
 	static MObject  aOutTransparency;
 
 	static MObject  aNormalCamera;

@@ -18,8 +18,11 @@ class Mesh : public Hitable
 	struct Triangle
 	{
 		int a;
+		int na;
 		int b;
+		int nb;
 		int c;
+		int nc;
 	};
 
 public:
@@ -30,6 +33,7 @@ public:
 private:
 	std::string name;
 	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
 	std::vector<Triangle> indices;
 	Material *material;
 };

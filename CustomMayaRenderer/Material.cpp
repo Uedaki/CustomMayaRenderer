@@ -10,22 +10,25 @@
 #include <map>
 #include <string>
 
+#include "DielectricMaterial.h"
+#include "DielectricNode.h"
 #include "LambertMaterial.h"
 #include "LambertNode.h"
+#include "MetalMaterial.h"
+#include "MetalNode.h"
 #include "utils.h"
 
 Material *Material::create(const MString &mName)
 {
 	const std::map<std::string, std::function<Material *(MObject)>> creator = {
-		{LambertNode::name.asChar(), LambertMaterial::create}
+		{LambertNode::name.asChar(), LambertMaterial::create},
+		{MetalNode::name.asChar(), MetalMaterial::create},
+		{DielectricNode::name.asChar(), DielectricMaterial::create}
 	};
-
-	if (mName == "")
-		return (new LambertMaterial(glm::vec3(0.3, 0.3, 0.3)));
 
 	MObject mShaderObject;
 	if (getDependencyNodeByName(mName, mShaderObject) != MS::kSuccess)
-		return (nullptr);
+		return (new LambertMaterial(glm::vec3(0.3, 0.3, 0.3)));
 	MFnDependencyNode mShaderNode(mShaderObject);
 	MPlug mMaterialType = mShaderNode.findPlug("materialName");
 

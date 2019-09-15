@@ -2,12 +2,12 @@
 
 #include <Maya/MPxSurfaceShadingNodeOverride.h>
 
-class LambertShader : public MHWRender::MPxSurfaceShadingNodeOverride
+class DielectricShader : public MHWRender::MPxSurfaceShadingNodeOverride
 {
 public:
 	static MHWRender::MPxSurfaceShadingNodeOverride *creator(const MObject &obj);
 
-	~LambertShader() override;
+	~DielectricShader() override;
 
 	MHWRender::DrawAPI supportedDrawAPIs() const override;
 
@@ -15,8 +15,9 @@ public:
 	void getCustomMappings(MHWRender::MAttributeParameterMappingList &mappings) override;
 
 	MString primaryColorParameter() const override;
+	MString transparencyParameter() const override;
 	MString bumpAttribute() const override;
 
 private:
-	LambertShader(const MObject &obj);
+	DielectricShader(const MObject &obj);
 };

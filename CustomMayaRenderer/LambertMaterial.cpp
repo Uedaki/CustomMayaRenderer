@@ -35,14 +35,3 @@ bool LambertMaterial::scatter(const Ray &ray, const HitRecord &hit, glm::vec3 &a
 	attenuation = albedo;
 	return (true);
 }
-
-glm::vec3 LambertMaterial::randomInUnitSphere() const
-{
-	glm::vec3 p;
-	do {
-		p = 2.0f * glm::vec3(ctmRand(),
-			ctmRand(),
-			ctmRand()) - glm::vec3(1, 1, 1);
-	} while (glm::length(p) >= 1);
-	return (p);
-}

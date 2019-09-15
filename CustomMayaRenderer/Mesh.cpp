@@ -12,7 +12,7 @@
 #include <glm/ext.hpp>
 
 #include <algorithm>
-#include <chrono>
+#include <map>
 
 #include "HitRecord.h"
 #include "Material.h"
@@ -49,17 +49,47 @@ Mesh::Mesh(MFnMesh &mMesh)
 	setBound(BoundType::LOWER_BOUND, glm::vec3(mLowerBound.x, mLowerBound.y, mLowerBound.z));
 	setBound(BoundType::UPPER_BOUND, glm::vec3(mUpperBound.x, mUpperBound.y, mUpperBound.z));
 
+	MFloatVectorArray mNormal;
+	mMesh.getNormals(mNormal);
+	for (unsigned int i = 0; i < mNormal.length(); ++i)
+	{
+		normals.emplace_back(mNormal[i].x, mNormal[i].y, mNormal[i].z);
+	}
+
 	MIntArray mTrianglesCount;
 	MIntArray mVerticesIndice;
 	mMesh.getTriangles(mTrianglesCount, mVerticesIndice);
-	indices.resize(mVerticesIndice.length());
-	for (unsigned int i = 0; i + 2 < mVerticesIndice.length(); i = i + 3)
+	//indices.resize(mVerticesIndice.length());
+	//for (unsigned int i = 0; i + 2 < mVerticesIndice.length(); i = i + 3)
+	//{
+	//	indices[i] = { mVerticesIndice[i], mVerticesIndice[i + 1], mVerticesIndice[i + 2]};
+	//}
+
+	for (int polygon = 0; polygon < mMesh.numPolygons(); ++polygon)
 	{
-		indices[i] = { mVerticesIndice[i], mVerticesIndice[i + 1], mVerticesIndice[i + 2]};
+		MIntArray vertexList;
+		MIntArray faceNormalList;
+		mMesh.getPolygonVertices(polygon, vertexList);
+		mMesh.getFaceNormalIds(polygon, faceNormalList);
+
+		std::map<int, int> vertexToNormal;
+		for (unsigned int i = 0; i < vertexList.length(); ++i)
+		{
+			vertexToNormal.emplace(vertexList[i], faceNormalList[i]);
+		}
+
+		//LOG_MSG("polygon %d with %d triangle", polygon, mTrianglesCount[polygon]);
+		for (int i = 0; i < mTrianglesCount[polygon]; ++i)
+		{
+			int vertexId[3];
+			mMesh.getPolygonTriangleVertices(polygon, i, vertexId);
+			indices.push_back({ vertexId[0], vertexToNormal[vertexId[0]],
+				vertexId[1], vertexToNormal[vertexId[1]],
+				vertexId[2], vertexToNormal[vertexId[2]] });
+		}
 	}
 
-	LOG_MSG("Object %s recorded with %d triangles using %d vertices", name, mVerticesIndice.length() / 3, mVertices.length());
-
+	LOG_MSG("Object %s recorded with %d triangles using %d vertices", name, indices.size(), mVertices.length());
 
 	MObjectArray mShaderArray;
 	MIntArray mShaderIndices;
@@ -74,6 +104,11 @@ Mesh::Mesh(MFnMesh &mMesh)
 	{
 		material = Material::create();
 	}
+
+	//LOG_MSG("polygons %d", mMesh.numPolygons());
+	//LOG_MSG("face vertices %d", mMesh.numFaceVertices());
+	//LOG_MSG("vertices %d", mMesh.numVertices());
+	//LOG_MSG("normals %d", mMesh.numNormals());
 }
 
 bool Mesh::hit(const Ray &ray, float min, float max, HitRecord &record) const
@@ -98,7 +133,11 @@ bool Mesh::hit(const Ray &ray, float min, float max, HitRecord &record) const
 			{
 				record.distance = t;
 				record.position = vertices[indice.a] + coord.x * e1 + coord.y * e2;
-				record.normal = glm::normalize(normal);
+
+				glm::vec3 n1 = normals[indice.nb] - normals[indice.na];
+				glm::vec3 n2 = normals[indice.nc] - normals[indice.na];
+				record.normal = glm::normalize(normals[indice.na] + coord.x * n1 + coord.y * n2);
+				
 				record.material = material;
 				max = t;
 				hasHit = true;

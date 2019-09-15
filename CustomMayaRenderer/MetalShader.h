@@ -2,12 +2,12 @@
 
 #include <Maya/MPxSurfaceShadingNodeOverride.h>
 
-class LambertShader : public MHWRender::MPxSurfaceShadingNodeOverride
+class MetalShader : public MHWRender::MPxSurfaceShadingNodeOverride
 {
 public:
 	static MHWRender::MPxSurfaceShadingNodeOverride *creator(const MObject &obj);
 
-	~LambertShader() override;
+	~MetalShader() override;
 
 	MHWRender::DrawAPI supportedDrawAPIs() const override;
 
@@ -18,5 +18,5 @@ public:
 	MString bumpAttribute() const override;
 
 private:
-	LambertShader(const MObject &obj);
+	MetalShader(const MObject &obj);
 };
