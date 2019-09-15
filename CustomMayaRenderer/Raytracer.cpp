@@ -1,12 +1,18 @@
 #include "pch.h"
 #include "Raytracer.h"
 
+#include <Maya/MRenderView.h>
+
 #include <glm/glm.hpp>
 
 #include "Collection.h"
 #include "HitRecord.h"
 #include "Ray.h"
 #include "utils.h"
+
+//void Raytracer::computeRegion(const RegionLimit &limit, const Camera &camera, const Collection &collection, RV_PIXEL *region)
+//{
+//}
 
 glm::vec3 Raytracer::computeRayColor(const Ray &ray, const Collection &collection, int depth)
 {

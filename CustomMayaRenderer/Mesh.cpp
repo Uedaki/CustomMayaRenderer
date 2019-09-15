@@ -129,7 +129,7 @@ bool Mesh::hit(const Ray &ray, float min, float max, HitRecord &record) const
 		glm::vec2 coord;
 		if (glm::intersectRayTriangle(ray.origin, ray.direction, vertices[indice.a], vertices[indice.b], vertices[indice.c], coord, t))
 		{
-			if (min < t && t < max)
+			if (min + 0.0003 < t && t < max - 0.0003)
 			{
 				record.distance = t;
 				record.position = vertices[indice.a] + coord.x * e1 + coord.y * e2;

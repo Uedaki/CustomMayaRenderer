@@ -29,7 +29,7 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 	int height = 1;
 	MString cameraName;
 
-	MArgDatabase argsData(parametersSyntax(), args);		
+	MArgDatabase argsData(parametersSyntax(), args);
 	if (!argsData.isFlagSet("-width")
 		|| !argsData.isFlagSet("-height")
 		|| !argsData.isFlagSet("-camera"))
@@ -73,8 +73,7 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 		}
 	}
 	MRenderView::endRender();
-	//Hitable::avgTime();
-	//Mesh::avgTime();
+
 	return (MS::kSuccess);
 }
 
