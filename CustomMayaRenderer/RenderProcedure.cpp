@@ -60,7 +60,7 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 				float v = static_cast<float>(y + ctmRand()) / height;
 
 				Ray ray = camera.getRay(u, v);
-				glm::vec3 color = Raytracer::computeRayColor(ray, collection, 0);
+				glm::vec3 color = Raytracer::computeRayColor(ray, collection, context.min, context.max, 0);
 				pix.r += color[0];
 				pix.g += color[1];
 				pix.b += color[2];

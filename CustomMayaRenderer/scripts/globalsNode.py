@@ -108,6 +108,22 @@ class CustomMayaRendererCommonTab(CustomMayaRendererGenericTab):
                         pm.separator(height=2)
 
                         pm.attrFieldSliderGrp(
+                                label = "Minimal distance",
+                                columnWidth = (3, 160),
+                                columnAttach= (1, "left", 4),
+                                minValue = 0,
+                                attribute = "customMayaRendererGlobalsNode.minDist"
+                            )
+
+                        pm.attrFieldSliderGrp(
+                                label = "Maximal distance",
+                                columnWidth = (3, 160),
+                                columnAttach= (1, "left", 4),
+                                minValue = 0,
+                                attribute = "customMayaRendererGlobalsNode.maxDist"
+                            )
+
+                        pm.attrFieldSliderGrp(
                                 label = "Number of samples:",
                                 columnWidth = (3, 160),
                                 columnAttach= (1, "left", 4),
@@ -116,6 +132,17 @@ class CustomMayaRendererCommonTab(CustomMayaRendererGenericTab):
                                 fieldMinValue = 1,
                                 fieldMaxValue = 100,
                                 attribute = "customMayaRendererGlobalsNode.samples")
+
+                        pm.attrFieldSliderGrp(
+                                label = "Number of bounces:",
+                                columnWidth = (3, 160),
+                                columnAttach = (1, "left", 4),
+                                minValue = 1,
+                                maxValue = 100,
+                                fieldMinValue = 1,
+                                fieldMaxValue = 50,
+                                attribute = "customMayaRendererGlobalsNode.maxBounces"
+                            )
 
 
         pm.setUITemplate("renderGlobalsTemplate", popTemplate=True)

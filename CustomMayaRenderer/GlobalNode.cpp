@@ -15,7 +15,10 @@ const MTypeId GlobalsNode::id(0x7f7f7);
 
 Context GlobalsNode::context;
 
+MObject GlobalsNode::minDist;
+MObject GlobalsNode::maxDist;
 MObject GlobalsNode::samples;
+MObject GlobalsNode::maxBounces;
 
 void *GlobalsNode::creator()
 {
@@ -27,16 +30,28 @@ MStatus GlobalsNode::initialize()
 	MStatus status;
 	MFnNumericAttribute numAttr;
 
+	minDist = numAttr.create("minDist", "minDist", MFnNumericData::kFloat, 0.1, &status);
+	CHECK_MSTATUS(status);
+	numAttr.setMin(0);
+	addAttribute(minDist);
+
+	maxDist = numAttr.create("maxDist", "maxDist", MFnNumericData::kFloat, 1000000, &status);
+	CHECK_MSTATUS(status);
+	numAttr.setMin(0);
+	addAttribute(maxDist);
+
 	samples = numAttr.create("samples", "samples", MFnNumericData::kInt, 8, &status);
 	if (status != MS::kSuccess)
 		LOG_MSG("Sample attribute failed");
 	numAttr.setMin(1);
-	numAttr.setSoftMax(1024);
-	numAttr.setReadable(true);
-	numAttr.setWritable(true);
-	numAttr.setKeyable(true);
-	numAttr.setStorable(true);
+	numAttr.setMax(1024);
 	addAttribute(samples);
+
+	maxBounces = numAttr.create("maxBounces", "mb", MFnNumericData::kInt, 16, &status);
+	CHECK_MSTATUS(status);
+	numAttr.setMin(1);
+	numAttr.setMax(1024);
+	addAttribute(maxBounces);
 
 	return (MS::kSuccess);
 }
@@ -52,9 +67,23 @@ const Context &GlobalsNode::fetchContext()
 	if (getDependencyNodeByName(GlobalsNode::name, mObj) != MS::kSuccess)
 		return (context);
 
-	MPlug mPlug(mObj, samples);
-	mPlug.getValue(context.samples);
-	LOG_MSG("sample %d", context.samples);
+	LOG_MSG("Fetch context:");
+
+	MPlug mMinDistPlug(mObj, minDist);
+	mMinDistPlug.getValue(context.min);
+	LOG_MSG("Minimal distance: %f", context.min);
+
+	MPlug mMaxDistPlug(mObj, maxDist);
+	mMaxDistPlug.getValue(context.max);
+	LOG_MSG("Maximal distance: %f", context.max);
+
+	MPlug mSamplesPlug(mObj, samples);
+	mSamplesPlug.getValue(context.samples);
+	LOG_MSG("Nb samples %d", context.samples);
+
+	MPlug mMaxBouncesPlug(mObj, maxBounces);
+	mMaxBouncesPlug.getValue(context.maxBounces);
+	LOG_MSG("Max bounce %d", context.maxBounces);
 
 	return (context);
 }
@@ -68,9 +97,21 @@ void GlobalsNode::clean()
 {
 	MObject mObj;
 	getDependencyNodeByName(GlobalsNode::name, mObj);
+	
 	MDGModifier modifier;
+
+	modifier.deleteNode(minDist);
+	modifier.doIt();
+
+	modifier.deleteNode(maxDist);
+	modifier.doIt();
+
 	modifier.deleteNode(samples);
 	modifier.doIt();
+
+	modifier.deleteNode(maxBounces);
+	modifier.doIt();
+
 	modifier.deleteNode(mObj);
 	modifier.doIt();
 }

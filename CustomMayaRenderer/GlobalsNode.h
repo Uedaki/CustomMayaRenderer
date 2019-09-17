@@ -23,5 +23,8 @@ public:
 private:
 	static Context context;
 
+	static MObject minDist;
+	static MObject maxDist;
 	static MObject samples;
+	static MObject maxBounces;
 };
