@@ -13,7 +13,7 @@ def register():
     createRenderMelProcedure()
     pm.renderer("customMayaRenderer", edit = True,
                 renderProcedure = "customMayaRendererRenderProcedureProxy",
-		        renderRegionProcedure = "customMayaRendererRenderRegionProcedure")
+		        renderRegionProcedure = "mayaRenderRegion")
 
     createRenderTabsMelProcedure()
     renderBuildSettingsCallback("customMayaRenderer")

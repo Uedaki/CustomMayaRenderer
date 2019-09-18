@@ -7,5 +7,7 @@ class RenderRegionProcedure : public MPxCommand
 public:
 	static void *creator();
 
-	MStatus doIt(const MArgList &arg);
+	MStatus doIt(const MArgList &args);
+
+	MSyntax parametersSyntax();
 };

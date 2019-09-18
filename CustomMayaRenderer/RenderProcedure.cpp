@@ -20,14 +20,12 @@ void *RenderProcedure::creator()
 
 MStatus RenderProcedure::doIt(const MArgList &args)
 {
-	LOG_MSG("Render procedure");
-
 	if (!MRenderView::doesRenderEditorExist())
 		return (MS::kFailure);
 
 	int width = 1;
 	int height = 1;
-	MString cameraName;
+	MString mCameraName;
 
 	MArgDatabase argsData(parametersSyntax(), args);
 	if (!argsData.isFlagSet("-width")
@@ -40,41 +38,53 @@ MStatus RenderProcedure::doIt(const MArgList &args)
 
 	argsData.getFlagArgument("-width", 0, width);
 	argsData.getFlagArgument("-height", 0, height);
-	argsData.getFlagArgument("-camera", 0, cameraName);
-	LOG_MSG("Width: %d Height: %d Camera: %s", width, height, cameraName.asChar());
+	argsData.getFlagArgument("-camera", 0, mCameraName);
 
-	Camera camera(cameraName);
-	Collection collection;
+	startRendering(width, height, mCameraName);
 
-	const Context &context = GlobalsNode::fetchContext();
+	return (MS::kSuccess);
+}
+
+void RenderProcedure::startRendering(int width, int height, MString mCameraName)
+{
+	LOG_MSG("----    Render procedure    ----");
+	LOG_MSG("Image rendered is %dx%d with %s camera", width, height, mCameraName.asChar());
+
 	MRenderView::startRender(width, height);
-	LOG_MSG("Start rendering");
-	for (int y = 0; y < height; y++)
+
+	Camera camera(mCameraName);
+	Collection collection;
+	const Context &context = GlobalsNode::fetchContext();
+
+	int step = 42;
+	RV_PIXEL *pix = new RV_PIXEL[static_cast<size_t>(width) * height];
+	memset(pix, 0, static_cast<size_t>(width) * height * sizeof(RV_PIXEL));
+	for (float s = 0; s < context.samples; s += 1)
 	{
-		for (int x = 0; x < width; x++)
+		for (int y = 0; y < height; y++)
 		{
-			RV_PIXEL pix = {};
-			for (int s = 0; s < context.samples; s++)
+			for (int x = 0; x < width; x++)
 			{
-				float u = static_cast<float>(x + ctmRand()) / width;
-				float v = static_cast<float>(y + ctmRand()) / height;
+				int idx = x + y * width;
+				float u = (static_cast<float>(x) + ctmRand()) / width;
+				float v = (static_cast<float>(y) + ctmRand()) / height;
 
 				Ray ray = camera.getRay(u, v);
 				glm::vec3 color = Raytracer::computeRayColor(ray, collection, context.min, context.max, 0);
-				pix.r += color[0];
-				pix.g += color[1];
-				pix.b += color[2];
-				pix.a = 255;
-			}
-			pix.r = pix.r / context.samples;
-			pix.g = pix.g / context.samples;
-			pix.b = pix.b / context.samples;
-			MRenderView::updatePixels(x, x + 1, y, y + 1, &pix);
-		}
-	}
-	MRenderView::endRender();
 
-	return (MS::kSuccess);
+				pix[idx].r = (pix[idx].r * s + color.r) / (s + 1);
+				pix[idx].g = (pix[idx].g * s + color.g) / (s + 1);
+				pix[idx].b = (pix[idx].b * s + color.b) / (s + 1);
+				pix[idx].a = 255;
+			}
+		}
+		MRenderView::updatePixels(0, width - 1, 0, height - 1, pix);
+		MRenderView::refresh(0, width - 1, 0, height - 1);
+	}
+	delete[] pix;
+
+	MRenderView::endRender();
+	LOG_MSG("-> Rendering finished!");
 }
 
 MSyntax RenderProcedure::parametersSyntax()

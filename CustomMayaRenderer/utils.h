@@ -17,7 +17,7 @@
 template <typename ...Args>
 void printMsg(const char *msg, Args... args)
 {
-	printf("%s : CustomMayaRenderer : ", __TIME__);
+	printf("CustomMayaRenderer | ");
 	printf(msg, args...);
 	printf("\n");
 }

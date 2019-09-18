@@ -59,11 +59,6 @@ Mesh::Mesh(MFnMesh &mMesh)
 	MIntArray mTrianglesCount;
 	MIntArray mVerticesIndice;
 	mMesh.getTriangles(mTrianglesCount, mVerticesIndice);
-	//indices.resize(mVerticesIndice.length());
-	//for (unsigned int i = 0; i + 2 < mVerticesIndice.length(); i = i + 3)
-	//{
-	//	indices[i] = { mVerticesIndice[i], mVerticesIndice[i + 1], mVerticesIndice[i + 2]};
-	//}
 
 	for (int polygon = 0; polygon < mMesh.numPolygons(); ++polygon)
 	{
@@ -78,7 +73,6 @@ Mesh::Mesh(MFnMesh &mMesh)
 			vertexToNormal.emplace(vertexList[i], faceNormalList[i]);
 		}
 
-		//LOG_MSG("polygon %d with %d triangle", polygon, mTrianglesCount[polygon]);
 		for (int i = 0; i < mTrianglesCount[polygon]; ++i)
 		{
 			int vertexId[3];
@@ -89,7 +83,7 @@ Mesh::Mesh(MFnMesh &mMesh)
 		}
 	}
 
-	LOG_MSG("Object %s recorded with %d triangles using %d vertices", name, indices.size(), mVertices.length());
+	LOG_MSG("Object %s recorded with %d triangles using %d vertices and %d normals", name, indices.size(), vertices.size(), normals.size());
 
 	MObjectArray mShaderArray;
 	MIntArray mShaderIndices;
@@ -104,11 +98,6 @@ Mesh::Mesh(MFnMesh &mMesh)
 	{
 		material = Material::create();
 	}
-
-	//LOG_MSG("polygons %d", mMesh.numPolygons());
-	//LOG_MSG("face vertices %d", mMesh.numFaceVertices());
-	//LOG_MSG("vertices %d", mMesh.numVertices());
-	//LOG_MSG("normals %d", mMesh.numNormals());
 }
 
 bool Mesh::hit(const Ray &ray, float min, float max, HitRecord &record) const

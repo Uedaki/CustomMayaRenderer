@@ -12,7 +12,7 @@
 
 Material *MetalMaterial::create(MObject mShaderNode)
 {
-	LOG_MSG("Metal material created");
+	LOG_MSG("- Metal material created");
 
 	MetalMaterial *mat = new MetalMaterial;
 

@@ -12,7 +12,7 @@
 
 Material *LambertMaterial::create(MObject mShaderNode)
 {
-	LOG_MSG("Lambert material created");
+	LOG_MSG("- Lambert material created");
 
 	LambertMaterial *mat = new LambertMaterial;
 

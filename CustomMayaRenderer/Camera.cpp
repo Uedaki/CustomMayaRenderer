@@ -42,8 +42,6 @@ Camera::Camera(const MString &mCameraName)
 	leftCorner = origin - halfWidth * u - halfHeight * v - w;
 	horizontal = 2 * halfWidth * u;
 	vertical = 2 * halfHeight * v;
-
-	LOG_MSG("Camera %s selected", mCameraName.asChar());
 }
 
 Ray Camera::getRay(float s, float t)

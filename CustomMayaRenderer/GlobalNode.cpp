@@ -71,19 +71,19 @@ const Context &GlobalsNode::fetchContext()
 
 	MPlug mMinDistPlug(mObj, minDist);
 	mMinDistPlug.getValue(context.min);
-	LOG_MSG("Minimal distance: %f", context.min);
+	LOG_MSG("- Minimal distance: %f", context.min);
 
 	MPlug mMaxDistPlug(mObj, maxDist);
 	mMaxDistPlug.getValue(context.max);
-	LOG_MSG("Maximal distance: %f", context.max);
+	LOG_MSG("- Maximal distance: %f", context.max);
 
 	MPlug mSamplesPlug(mObj, samples);
 	mSamplesPlug.getValue(context.samples);
-	LOG_MSG("Nb samples %d", context.samples);
+	LOG_MSG("- Nb samples %d", context.samples);
 
 	MPlug mMaxBouncesPlug(mObj, maxBounces);
 	mMaxBouncesPlug.getValue(context.maxBounces);
-	LOG_MSG("Max bounce %d", context.maxBounces);
+	LOG_MSG("- Max bounce %d", context.maxBounces);
 
 	return (context);
 }

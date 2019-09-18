@@ -12,7 +12,7 @@
 
 Material *DielectricMaterial::create(MObject mShaderNode)
 {
-	LOG_MSG("Dielectric material created");
+	LOG_MSG("- Dielectric material created");
 
 	DielectricMaterial *mat = new DielectricMaterial;
 
