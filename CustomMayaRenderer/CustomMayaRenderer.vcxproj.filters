@@ -30,12 +30,6 @@
     <ClInclude Include="RenderProcedure.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="RenderRegionProcedure.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="rendererSettingsMenu.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>.dll</Filter>
     </ClInclude>
@@ -105,9 +99,6 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="RenderProcedure.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderRegionProcedure.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">

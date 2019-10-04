@@ -61,6 +61,7 @@ void RenderProcedure::startRendering(int width, int height, MString mCameraName)
 	memset(pix, 0, static_cast<size_t>(width) * height * sizeof(RV_PIXEL));
 	for (float s = 0; s < context.samples; s += 1)
 	{
+		LOG_MSG("Rendering sample %f", s);
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)

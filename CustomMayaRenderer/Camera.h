@@ -18,10 +18,4 @@ private:
 	glm::vec3 horizontal;
 	glm::vec3 vertical;
 	glm::vec3 leftCorner;
-
-	glm::vec3 u;
-	glm::vec3 v;
-
-	float vLensRadius;
-	float hLensRadius;
 };

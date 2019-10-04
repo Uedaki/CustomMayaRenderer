@@ -28,9 +28,10 @@ Material *Material::create(const MString &mName)
 
 	MObject mShaderObject;
 	if (getDependencyNodeByName(mName, mShaderObject) != MS::kSuccess)
-		return (new LambertMaterial(glm::vec3(0.3, 0.3, 0.3)));
+		return (new LambertMaterial(glm::vec3(0.5, 0.5, 0.5)));
 	MFnDependencyNode mShaderNode(mShaderObject);
 	MPlug mMaterialType = mShaderNode.findPlug("materialName");
-
-	return (creator.at(mMaterialType.asString().asChar())(mShaderObject));
+	if (creator.find(mMaterialType.asString().asChar()) != creator.cend())
+		return (creator.at(mMaterialType.asString().asChar())(mShaderObject));
+	return (new LambertMaterial(glm::vec3(0.5, 0.5, 0.5)));
 }

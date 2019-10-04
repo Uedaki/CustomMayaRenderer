@@ -260,9 +260,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     <ClInclude Include="pch.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Raytracer.h" />
-    <ClInclude Include="rendererSettingsMenu.h" />
     <ClInclude Include="RenderProcedure.h" />
-    <ClInclude Include="RenderRegionProcedure.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -291,7 +289,6 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
     </ClCompile>
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="RenderProcedure.cpp" />
-    <ClCompile Include="RenderRegionProcedure.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>

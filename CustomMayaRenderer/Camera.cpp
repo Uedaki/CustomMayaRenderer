@@ -36,8 +36,8 @@ Camera::Camera(const MString &mCameraName)
 	float halfWidth = aspect * halfHeight;
 
 	glm::vec3 w = -1.0f * glm::normalize(direction);
-	u = glm::normalize(glm::cross(up, w));
-	v = glm::cross(w, u);
+	glm::vec3 u = glm::normalize(glm::cross(up, w));
+	glm::vec3 v = glm::cross(w, u);
 
 	leftCorner = origin - halfWidth * u - halfHeight * v - w;
 	horizontal = 2 * halfWidth * u;

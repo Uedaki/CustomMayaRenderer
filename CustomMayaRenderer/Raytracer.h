@@ -18,7 +18,5 @@ struct RegionLimit
 class Raytracer
 {
 public:
-	//static void computeRegion(const RegionLimit &limit, const Camera &camera, const Collection &collection, RV_PIXEL *region);
-
 	static glm::vec3 computeRayColor(const Ray &ray, const Collection &collection, float min, float max, int step);
 };

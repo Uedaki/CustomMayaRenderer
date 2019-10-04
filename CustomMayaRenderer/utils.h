@@ -22,9 +22,6 @@ void printMsg(const char *msg, Args... args)
 	printf("\n");
 }
 
-#define STATUS_CHECK(status) if (status != MS::kSuccess) LOG_MSG(status.errorString().asChar());
-#define STATUS_BARRIER(status) if (status != MS::kSuccess) { LOG_MSG(status.errorString().asChar()); return (MS::kFailure); }
-
 float ctmRand();
 
 glm::vec3 reflect(const glm::vec3 &v, const glm::vec3 &n);

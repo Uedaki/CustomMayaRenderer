@@ -17,20 +17,18 @@
 #include "MetalNode.h"
 #include "MetalShader.h"
 #include "RenderProcedure.h"
-#include "RenderRegionProcedure.h"
 #include "utils.h"
 
 MStatus initializePlugin(MObject obj)
 {
 	MFnPlugin plugin(obj, "Custom Maya Renderer", "0.1", "Any");
 	
-	STATUS_BARRIER(plugin.registerNode(GlobalsNode::name, GlobalsNode::id, GlobalsNode::creator, GlobalsNode::initialize));
+	CHECK_MSTATUS(plugin.registerNode(GlobalsNode::name, GlobalsNode::id, GlobalsNode::creator, GlobalsNode::initialize));
 
-	STATUS_BARRIER(plugin.registerCommand("customMayaRendererRenderProcedure", RenderProcedure::creator));
-	STATUS_BARRIER(plugin.registerCommand("customMayaRendererRenderRegionProcedure", RenderRegionProcedure::creator));
+	CHECK_MSTATUS(plugin.registerCommand("customMayaRendererRenderProcedure", RenderProcedure::creator));
 
-	STATUS_BARRIER(MGlobal::executePythonCommand("import CustomMayaRenderer", false, false));
-	STATUS_BARRIER(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.register()", false, false));
+	CHECK_MSTATUS(MGlobal::executePythonCommand("import CustomMayaRenderer", false, false));
+	CHECK_MSTATUS(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.register()", false, false));
 
 	MString sDrawLambertDBClassification("drawdb/shader/surface/" + LambertNode::name);
 	MString sLambertFullClassification("shader/surface:" + sDrawLambertDBClassification);
@@ -55,11 +53,10 @@ MStatus uninitializePlugin(MObject obj)
 {
 	MFnPlugin plugin(obj);
 
-	STATUS_CHECK(plugin.deregisterCommand("customMayaRendererRenderProcedure"));
-	STATUS_CHECK(plugin.deregisterCommand("customMayaRendererRenderRegionProcedure"));
+	CHECK_MSTATUS(plugin.deregisterCommand("customMayaRendererRenderProcedure"));
 
 	GlobalsNode::clean();
-	STATUS_CHECK(plugin.deregisterNode(GlobalsNode::id));
+	CHECK_MSTATUS(plugin.deregisterNode(GlobalsNode::id));
 
 	MString command("if( `window -exists createRenderNodeWindow` ) {refreshCreateRenderNodeWindow(\"");
 
@@ -75,7 +72,7 @@ MStatus uninitializePlugin(MObject obj)
 	plugin.deregisterNode(DielectricNode::id);
 	MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(sDrawDielectricDBClassification, DielectricNode::name);
 
-	STATUS_CHECK(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.unregister()", false, false));
+	CHECK_MSTATUS(MGlobal::executePythonCommand("import CustomMayaRenderer.register; CustomMayaRenderer.register.unregister()", false, false));
 
 	LOG_MSG("Plugin unloaded successfully");
 	return (MS::kSuccess);

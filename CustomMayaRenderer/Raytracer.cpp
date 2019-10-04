@@ -11,10 +11,6 @@
 #include "Ray.h"
 #include "utils.h"
 
-//void Raytracer::computeRegion(const RegionLimit &limit, const Camera &camera, const Collection &collection, RV_PIXEL *region)
-//{
-//}
-
 glm::vec3 Raytracer::computeRayColor(const Ray &ray, const Collection &collection, float min, float max, int depth)
 {
 	HitRecord record;
