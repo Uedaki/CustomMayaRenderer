@@ -115,13 +115,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;CUSTOMMAYARENDERER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>P:\Program Files\Autodesk\Maya2018\Python\Lib\site-packages;D:\Uedaki\Documents\MayaDevkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MAYA_PYTHON_PATH);$(MAYA_DEV_KIT_PATH)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Uedaki\Documents\MayaDevkit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MAYA_DEV_KIT_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaRender.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -146,13 +146,13 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
       <PreprocessorDefinitions>_DEBUG;CUSTOMMAYARENDERER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>P:\Program Files\Autodesk\Maya2018\Python\Lib\site-packages;D:\Uedaki\Documents\MayaDevkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MAYA_PYTHON_PATH);$(MAYA_DEV_KIT_PATH)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Uedaki\Documents\MayaDevkit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MAYA_DEV_KIT_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaRender.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -179,7 +179,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
       <PreprocessorDefinitions>WIN32;NDEBUG;CUSTOMMAYARENDERER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>P:\Program Files\Autodesk\Maya2018\Python\Lib\site-packages;D:\Uedaki\Documents\MayaDevkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MAYA_PYTHON_PATH);$(MAYA_DEV_KIT_PATH)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -187,7 +187,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Uedaki\Documents\MayaDevkit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MAYA_DEV_KIT_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaRender.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -214,7 +214,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
       <PreprocessorDefinitions>NDEBUG;CUSTOMMAYARENDERER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>P:\Program Files\Autodesk\Maya2018\Python\Lib\site-packages;D:\Uedaki\Documents\MayaDevkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MAYA_PYTHON_PATH);$(MAYA_DEV_KIT_PATH)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -222,7 +222,7 @@ xcopy /d /s /i /y "$(ProjectDir)scripts" "$(SolutionDir)sandbox/scripts/$(Projec
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Uedaki\Documents\MayaDevkit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MAYA_DEV_KIT_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaRender.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
